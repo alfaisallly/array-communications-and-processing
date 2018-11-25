@@ -6,7 +6,7 @@ elevationAngle = 0;
 % to be determined by actual case
 % eg. if target is 90 azimuth out of [30 35 90], the index is 3
 audioTargetIndex = 3;
-imageTargetIndex = 5;
+imageTargetIndex = 3;
 %% Covariance matrix: practice
 load('xAudio'); load('xImage');
 signalAudio = X_au;

@@ -1,9 +1,9 @@
 function [nSource, eigVectorSignal] = detection(covRx)
 % assume max noise power / min noise power is below noiseRatioThr
 % to be determined by actual environments; assume 10 here
-noiseRatioThr = 10;
+noiseRatioThr = 1e2;
 [eigVector, eigValue] = eig(covRx);
-eigValue = diag(eigValue);
+eigValue = abs(diag(eigValue));
 eigNoiseThr = min(eigValue) * noiseRatioThr;
 nSource = sum(eigValue > eigNoiseThr);
 eigVectorSignal = eigVector(:, eigValue > eigNoiseThr);

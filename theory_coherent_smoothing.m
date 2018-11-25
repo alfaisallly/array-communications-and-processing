@@ -15,30 +15,36 @@ plot2d3d(patternOriginal, azimuthAngle, elevationAngle, 'Gain in dB', 'Initial g
 hold on;
 %% Source position vector
 % gain of elements on all directions
-spvTheory = spv(posRxSensor, dirTx);
+% spvTheory = spv(posRxSensor, dirTx);
 %% Covariance matrix: theory
 % normalised equal power sources -> unit diagonal; uncorrelated -> others
 % entries zero; size determined by number of transmitters
-covTx = eye(length(dirTx));
+covTxCoherent = eye(length(dirTx));
+% two sources are fully correlated
+covTxCoherent(2, :) = covTxCoherent(1, :);
 % covariance matrix of transmitted signal
 % diagonal -> signal power; others -> covariance of signals
-covRx = spvTheory * covTx * spvTheory' + varNoise * eye(length(posRxSensor));
+[covRxCoherent, subarray, covRxSub] = spatial_smooth(posRxSensor, dirTx, covTxCoherent, varNoise);
+% covRx = spvTheory * covTxCoherent * spvTheory' + varNoise * eye(length(posRxSensor));
 % source information is actually unknown
 dirTx = [];
-covTx = [];
-spvTheory = [];
+covTxCoherent = [];
+% spvTheory = [];
 varNoise = [];
-%% Estimation: conventional approach
-% manifold vector of the desired source
-spvDesired = spv(posRxSensor, dirDesired);
-% optimum weight by Wiener-Hopf solution
-weightWh = gainWh * covRx \ spvDesired;
-patternWh = pattern(posRxSensor, weightWh);
-plot2d3d(patternWh, azimuthAngle, elevationAngle, 'Gain in dB', 'Gain pattern by W-H beamformer');
-hold on;
+% %% Estimation: conventional approach
+% % manifold vector of the desired source
+% spvDesired = spv(posRxSensor, dirDesired);
+% % optimum weight by Wiener-Hopf solution
+% weightWh = gainWh * covRxCoherent \ spvDesired;
+% patternWh = pattern(posRxSensor, weightWh);
+% plot2d3d(patternWh, azimuthAngle, elevationAngle, 'Gain in dB', 'Gain pattern by W-H beamformer');
+% hold on;
 %% Estimation: superresolution approach
 % estimate doa with MUSIC algorithm
-doa = music(posRxSensor, covRx);
+% for iSubarray = 1: length(subarray)
+%     doa = music(subarray{iSubarray}, covRxCoherent);
+% end
+doa = music(posRxSensor, covRxCoherent);
 [patternSuperRes] = superres(posRxSensor, dirDesired, doa);
 plot2d3d(patternSuperRes, azimuthAngle, elevationAngle, 'Gain in dB', 'Gain pattern by superresolution beamformer');
 legend('Original', 'Wiener-Hopf', 'Superres','location','southeast');

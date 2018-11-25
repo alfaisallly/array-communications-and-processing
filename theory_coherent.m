@@ -19,13 +19,15 @@ spvTheory = spv(posRxSensor, dirTx);
 %% Covariance matrix: theory
 % normalised equal power sources -> unit diagonal; uncorrelated -> others
 % entries zero; size determined by number of transmitters
-covTx = eye(length(dirTx));
+covTxCoherent = eye(length(dirTx));
+% two sources are fully correlated
+covTxCoherent(2, :) = covTxCoherent(1, :);
 % covariance matrix of transmitted signal
 % diagonal -> signal power; others -> covariance of signals
-covRx = spvTheory * covTx * spvTheory' + varNoise * eye(length(posRxSensor));
+covRx = spvTheory * covTxCoherent * spvTheory' + varNoise * eye(length(posRxSensor));
 % source information is actually unknown
 dirTx = [];
-covTx = [];
+covTxCoherent = [];
 spvTheory = [];
 varNoise = [];
 %% Estimation: conventional approach
