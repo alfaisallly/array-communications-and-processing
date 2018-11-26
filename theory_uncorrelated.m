@@ -3,6 +3,7 @@ array=[-2 0 0; -1 0 0; 0 0 0; 1 0 0; 2 0 0];
 azimuth = 0: 180;
 elevation = 0;
 directions = [30 0; 35 0; 90 0];
+% assume target is the last direction
 dirTarget = directions(3, :);
 gainWh = 1;
 % additive uncorrelated isotropic noise, SNR = 40 dB
@@ -17,29 +18,28 @@ hold on;
 % gain of elements on all directions
 spvSources = spv(array, directions);
 %% Covariance matrix: theory
-% normalised equal power sources -> unit diagonal; size determined by
-% number of transmitters
-% two sources are fully correlated
-covCoherentTx = [1 1 0; 1 1 0; 0 0 1];
+% normalised equal power sources -> unit diagonal; uncorrelated -> others
+% entries zero; size determined by number of transmitters
+covTx = eye(length(directions));
 % covariance matrix of transmitted signal
 % diagonal -> signal power; others -> covariance of signals
-covCoherentRx = spvSources * covCoherentTx * spvSources' + varNoise * eye(length(array));
+covRx = spvSources * covTx * spvSources' + varNoise * eye(length(array));
 %% source information is actually unknown
 directions = [];
-covCoherentTx = [];
+covTx = [];
 spvSources = [];
 varNoise = [];
 %% Estimation: conventional approach
 % manifold vector of the desired source
 spvTarget = spv(array, dirTarget);
 % optimum weight by Wiener-Hopf solution
-weightWh = gainWh * covCoherentRx \ spvTarget;
+weightWh = gainWh * covRx \ spvTarget;
 patternWh = pattern(array, weightWh);
 plot2d3d(patternWh, azimuth, elevation);
 hold on;
 %% Estimation: superresolution approach
 % estimate doa with MUSIC algorithm
-doa = music(array, covCoherentRx);
-[patternSuperres] = superres(array, dirTarget, doa);
-plot2d3d(patternSuperres, azimuth, elevation, 'Gain in dB', 'Gain pattern by beamformers');
+doa = music(array, covRx);
+[patternSuperres, ~] = superres(array, dirTarget, doa);
+plot2d3d(patternSuperres, azimuth, elevation, 'Gain in dB', 'Gain pattern of beamformers');
 legend('Plain', 'Wiener-Hopf', 'Superresolution','location','southeast');

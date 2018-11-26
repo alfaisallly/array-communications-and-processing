@@ -1,24 +1,17 @@
-function [patternSuperRes] = superres(posRxSensor, dirDesired, doa)
-%MUSIC Summary of this function goes here
-%   Detailed explanation goes here
-% patternSuperRes = [];
+function [patternSuperres, weight] = superres(array, dirTarget, doa)
 mainlobe = [];
+azimuth = 0: 180;
+elevation = 0;
 isLog = true;
-azimuthAngle = 0: 180;
-elevationAngle = 0;
-% % obtain target angle by maximum gain direction
-% spvDoa = spv(posRxSensor, doa, mainlobe);
-dirInterf = setdiff(doa, dirDesired, 'rows');
-spvInterf = spv(posRxSensor, dirInterf, mainlobe);
-spvDesired = spv(posRxSensor, dirDesired, mainlobe);
-spvAllDir = spv(posRxSensor, [azimuthAngle', elevationAngle * ones(size(azimuthAngle'))], mainlobe);
+dirInterf = setdiff(doa, dirTarget, 'rows');
+spvInterf = spv(array, dirInterf, mainlobe);
+spvTarget = spv(array, dirTarget, mainlobe);
+spvAll = spv(array, [azimuth', elevation * ones(size(azimuth'))], mainlobe);
 % weight by superresolution based on doa
-weight = fpoc(spvInterf) * spvDesired;
-patternSuperRes = abs(weight' * spvAllDir);
-
+weight = fpoc(spvInterf) * spvTarget;
+patternSuperres = abs(weight' * spvAll);
 if isLog == true
-    patternSuperRes = 10 * log10(patternSuperRes);
+    patternSuperres = 10 * log10(patternSuperres);
 end
-
 end
 
