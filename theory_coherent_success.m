@@ -19,14 +19,14 @@ hold on;
 % two sources are fully correlated
 covCoherentTx = [1 1 0; 1 1 0; 0 0 1];
 % averaged covariance matrix of transmitted signal by spatial smoothing
-[covCoherentRx, subarray] = spatial_smoothing(array, directions, covCoherentTx, varNoise);
+[covMeanRx, subarray] = spatial_smoothing(array, directions, covCoherentTx, varNoise);
 %% source information is actually unknown
 directions = [];
 covCoherentTx = [];
 varNoise = [];
 %% Estimation: superresolution approach
 % detect doa with any subarray
-doa = music(subarray{1}, covCoherentRx);
-[patternSuperres] = superres(array, dirTarget, doa);
+doa = music(subarray{1}, covMeanRx);
+[patternSuperres, ~] = superres(array, dirTarget, doa);
 plot2d3d(patternSuperres, azimuth, elevation, 'Gain in dB', 'Gain pattern by beamformers');
 legend('Plain', 'Superresolution','location','southeast');

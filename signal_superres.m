@@ -3,11 +3,7 @@ array=[-2 0 0; -1 0 0; 0 0 0; 1 0 0; 2 0 0];
 azimuth = 0: 180;
 elevation = 0;
 gainWh = 1;
-% the index of desired user's angle among all doa
-% to be determined by actual case
-% eg. if target is 90 azimuth out of [30 35 90], the index is 3
-targetIndex = 3;
-%% Covariance matrix: practice
+%% Signal recovery by superresolution: accurate
 load('xAudio'); load('xImage');
 signalAudio = X_au;
 signalImage = X_im;
@@ -15,7 +11,7 @@ soundsc(real(signalAudio(2, :)), 11025);
 displayimage(signalImage(2, :), image_size, 201, 'The received signal at the 2nd antenna');
 covAudio = signalAudio * signalAudio' / length(signalAudio(1, :));
 covImage = signalImage * signalImage' / length(signalImage(1, :));
-% doaAudio = doaImage;
+% doa are the same for audio and image;
 doa = music(array, covAudio);
 nTargets = length(doa);
 for iTarget = 1: nTargets

@@ -40,6 +40,6 @@ hold on;
 %% Estimation: superresolution approach
 % estimate doa with MUSIC algorithm
 doa = music(array, covCoherentRx);
-[patternSuperres] = superres(array, dirTarget, doa);
+[patternSuperres, ~] = superres(array, dirTarget, doa);
 plot2d3d(patternSuperres, azimuth, elevation, 'Gain in dB', 'Gain pattern by beamformers');
 legend('Plain', 'Wiener-Hopf', 'Superresolution','location','southeast');
